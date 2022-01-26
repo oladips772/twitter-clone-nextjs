@@ -14,12 +14,14 @@ import {
 import Post from "../shared/Post";
 import { Picker } from "emoji-mart";
 import "emoji-mart/css/emoji-mart.css";
+import { auth } from "../../firebase";
 
 function Posts() {
   const [input, setInput] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
   const filePickerRef = useRef(null);
   const [showEmojis, setShowEmojis] = useState(false);
+    const [user] = useAuthState(auth);
 
   const addImageToPost = (e) => {
     const reader = new FileReader();
