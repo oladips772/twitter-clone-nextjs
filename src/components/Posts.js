@@ -14,15 +14,32 @@ import {
 import Post from "../shared/Post";
 import { Picker } from "emoji-mart";
 import "emoji-mart/css/emoji-mart.css";
-import { auth } from "../../firebase";
+import { auth, db, storage } from "../firebase";
+import { useAuthState } from "react-firebase-hooks/auth";
+import {
+  addDoc,
+  collection,
+  serverTimestamp,
+  onSnapshot,
+  updateDoc,
+  doc,
+} from "firebase/firestore";
+import {
+  getDownloadURL,
+  uploadString,
+  ref,
+} from "firebase/storage";
 
 function Posts() {
   const [input, setInput] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
   const filePickerRef = useRef(null);
   const [showEmojis, setShowEmojis] = useState(false);
-    const [user] = useAuthState(auth);
+  const [user] = useAuthState(auth);
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(false);
 
+  // ? selecting a file for post
   const addImageToPost = (e) => {
     const reader = new FileReader();
     if (e.target.files[0]) {
@@ -30,9 +47,9 @@ function Posts() {
     }
     reader.onload = (readerEvent) => {
       setSelectedFile(readerEvent.target.result);
-    };
+    };                                                                                                                                                                                                                                                  
   };
-
+  // ? adding emojis to input
   const addEmoji = (e) => {
     let sym = e.unified.split("-");
     let codesArray = [];
@@ -41,10 +58,40 @@ function Posts() {
     setInput(input + emoji);
   };
 
+  // ? sendto post function.
+  const sendPost = async () => {
+    if (loading) return;
+    setLoading(true);
+
+    const docRef = await addDoc(collection(db, "posts"), {
+      postText: input,
+      postId: user.uid,
+      userName: user.displayName,
+      userEmail: user.email,
+      userImg: user.photoURL,
+      timestamp: serverTimestamp(),
+    });
+
+    if (selectedFile) {
+      const imageRef = ref(storage, `posts/${docRef.id}/image`);
+      await uploadString(imageRef, selectedFile, "data_url").then(async () => {
+        const downloadURL = await getDownloadURL(imageRef);
+        await updateDoc(doc(db, "posts", docRef.id), {
+          image: downloadURL,
+        });
+      });
+    }
+
+    setInput("");
+    setShowEmojis(false);
+    setSelectedFile(null);
+    setLoading(null);
+  };
+
   return (
     <div className="pt-2">
       {/* posts header */}
-      <div className="flex justify-between items-center h-12 fixed top-0 w-[46%] bg-black">
+      <div className="flex justify-between items-center h-12 fixed top-0 w-[46%] bg-black z-50">
         <h2 className="text-white text-lg font-bold ml-2">Home</h2>
         <SparklesIcon className="h-6 text-[#2bc4ff] cursor-pointer" />
       </div>
@@ -120,7 +167,11 @@ function Posts() {
                 theme="dark"
               />
             )}
-            <button className="text-white p-1 rounded-2xl bg-[#2bc4ff] w-[80px] font-bold">
+            <button
+              onClick={sendPost}
+              className="text-white p-1 rounded-2xl bg-[#2bc4ff] w-[80px] font-bold disabled:cursor-default disabled:bg-[#0a435a]"
+              disabled={!input.trim() && !selectedFile}
+            >
               Tweet
             </button>
           </div>
