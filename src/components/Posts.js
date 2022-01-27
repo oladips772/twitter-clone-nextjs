@@ -126,64 +126,69 @@ function Posts() {
               </div>
             )}
             <div className="flex items-center space-x-2 cursor-pointer hover:bg-[#526369] rounded-2xl w-[170px] p-1 mb-1">
-              <GlobeIcon className="text-[#2bc4ff] h-5" />
+              {!loading && <GlobeIcon className="text-[#2bc4ff] h-5" />}
               <p className="text-[#2bc4ff] text-sm font-bold">
-                Everyone can reply
+                {!loading ? "Everyone can reply" : "uploading..."}
               </p>
             </div>
           </div>
           {/* all buttons div */}
-          <div className="flex items-center space-x-2 border-t mt-2 pt-2 -mb-2 relative">
-            <div className="flex items-center space-x-3 flex-1">
-              <PhotographIcon
-                className="h-6 cursor-pointer text-[#2bc4ff]"
-                onClick={() => filePickerRef.current.click()}
-              />
-              <EmojiHappyIcon
-                className="h-6 cursor-pointer text-[#2bc4ff]"
-                onClick={() => setShowEmojis(!showEmojis)}
-              />
-              <CalendarIcon className="h-6 cursor-pointer text-[#2bc4ff]" />
-              <ChartBarIcon className="h-6 cursor-pointer text-[#2bc4ff] rotate-90" />
-              <HashtagIcon className="h-6 cursor-pointer text-[#2bc4ff]" />
-              <LocationMarkerIcon className="h-6 w-6 cursor-pointer text-[#2bc4ff]" />
-              <input
-                type="file"
-                hidden
-                ref={filePickerRef}
-                onChange={addImageToPost}
-              />
+          {!loading && (
+            <div className="flex items-center space-x-2 border-t mt-2 pt-2 -mb-2 relative">
+              <div className="flex items-center space-x-3 flex-1">
+                <PhotographIcon
+                  className="h-6 cursor-pointer text-[#2bc4ff]"
+                  onClick={() => filePickerRef.current.click()}
+                />
+                <EmojiHappyIcon
+                  className="h-6 cursor-pointer text-[#2bc4ff]"
+                  onClick={() => setShowEmojis(!showEmojis)}
+                />
+                <CalendarIcon className="h-6 cursor-pointer text-[#2bc4ff]" />
+                <ChartBarIcon className="h-6 cursor-pointer text-[#2bc4ff] rotate-90" />
+                <HashtagIcon className="h-6 cursor-pointer text-[#2bc4ff]" />
+                <LocationMarkerIcon className="h-6 w-6 cursor-pointer text-[#2bc4ff]" />
+                <input
+                  type="file"
+                  hidden
+                  ref={filePickerRef}
+                  onChange={addImageToPost}
+                />
+              </div>
+
+              {showEmojis && (
+                <Picker
+                  onSelect={addEmoji}
+                  style={{
+                    position: "absolute",
+                    marginTop: "465px",
+                    marginLeft: -40,
+                    maxWidth: "320px",
+                    borderRadius: "20px",
+                  }}
+                  theme="dark"
+                />
+              )}
+              <button
+                onClick={sendPost}
+                className="text-white p-1 rounded-2xl bg-[#2bc4ff] w-[80px] font-bold disabled:cursor-default disabled:bg-[#0a435a]"
+                disabled={!input.trim() && !selectedFile}
+              >
+                Tweet
+              </button>
             </div>
-            {showEmojis && (
-              <Picker
-                onSelect={addEmoji}
-                style={{
-                  position: "absolute",
-                  marginTop: "465px",
-                  marginLeft: -40,
-                  maxWidth: "320px",
-                  borderRadius: "20px",
-                }}
-                theme="dark"
-              />
-            )}
-            <button
-              onClick={sendPost}
-              className="text-white p-1 rounded-2xl bg-[#2bc4ff] w-[80px] font-bold disabled:cursor-default disabled:bg-[#0a435a]"
-              disabled={!input.trim() && !selectedFile}
-            >
-              Tweet
-            </button>
-          </div>
+          )}
         </div>
       </div>
       {/* end of of tweeing div */}
       {/* show all 120 tweets */}
       <div className="mt-4 border-t pt-2 flex justify-center items-center">
-        <h4 className="text-[#2bc4ff] cursor-pointer">Show 120 Tweets</h4>
+        <h4 className="text-[#2bc4ff] cursor-pointer pb-2">Show 120 Tweets</h4>
       </div>
       {/* end of all posts header */}
       <div>
+        <Post />
+        <Post />
         <Post />
       </div>
     </div>
