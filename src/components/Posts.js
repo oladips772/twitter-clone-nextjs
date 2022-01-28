@@ -48,7 +48,7 @@ function Posts() {
         }))
       );
     });
-  });
+  },[]);
 
   // ? selecting a file for post
   const addImageToPost = (e) => {
@@ -76,7 +76,6 @@ function Posts() {
 
     const docRef = await addDoc(collection(db, "posts"), {
       postText: input,
-      postId: user.uid,
       userName: user.displayName,
       userEmail: user.email,
       userImg: user.photoURL,
@@ -110,7 +109,7 @@ function Posts() {
       <div className="mt-12 mx-2 flex">
         <img
           alt
-          src="https://media-exp1.licdn.com/dms/image/C4E03AQFOfPu93n6Kxw/profile-displayphoto-shrink_100_100/0/1632301101571?e=1648684800&v=beta&t=ixFggKFL60XV1npTtrk9PQnKH6ApktyZ-XF1n3mxF_4"
+          src={user.photoURL}
           className=" h-12 w-12 rounded-full object-contain mr-2"
         />{" "}
         {/* tweeting input div */}
@@ -211,6 +210,7 @@ function Posts() {
               postImage={image}
               userImg={userImg}
               timestamp={timestamp}
+              id={id}
             />
           )
         )}

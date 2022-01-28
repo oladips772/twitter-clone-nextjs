@@ -1,5 +1,5 @@
 /** @format */
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   HeartIcon,
   ChatIcon,
@@ -8,8 +8,17 @@ import {
   DotsHorizontalIcon,
   EmojiHappyIcon,
 } from "@heroicons/react/outline";
-import { HeaertIcon as HeartIconFilled } from "@heroicons/react/solid";
+import { HeartIcon as HeartIconFilled } from "@heroicons/react/solid";
 import Moment from "react-moment";
+import { db, auth } from "../firebase";
+import { useAuthState } from "react-firebase-hooks/auth";
+import {
+  collection,
+  onSnapshot,
+  deleteDoc,
+  setDoc,
+  doc,
+} from "firebase/firestore";
 
 function Post({
   postText,
@@ -18,10 +27,65 @@ function Post({
   userImg,
   postImage,
   timestamp,
+  id,
 }) {
   const [open, setOpen] = useState(false);
   const [comment, setComment] = useState("");
   const [comments, setComments] = useState([]);
+  const [likes, setLikes] = useState([]);
+  const [hasLiked, setHasLiked] = useState(false);
+  const [user] = useAuthState(auth);
+
+  // likes useEffect function
+  useEffect(() => {
+    const docRef = collection(db, "posts", id, "likes");
+    onSnapshot(docRef, (snapshot) => {
+      setLikes(
+        snapshot.docs.map((doc) => ({
+          id: doc.id,
+          data: doc.data(),
+        }))
+      );
+    });
+  }, [db, id]);
+
+  useEffect(
+    () =>
+      setHasLiked(likes.findIndex((likes) => likes.id === user?.uid) !== -1),
+    [likes]
+  );
+
+  // likePost function
+  const likePost = async () => {
+    if (hasLiked) {
+      await deleteDoc(doc(db, "posts", id, "likes", user.uid), {
+        username: user.displayName,
+      });
+    } else {
+      await setDoc(doc(db, "posts", id, "likes", user.uid), {
+        username: user.displayName,
+      });
+    }
+  };
+
+  const sendComment = async () => {
+    if (loading) return;
+    setLoading(true);
+    setComment("")
+    const commentToSend = comment;
+    const colRef = collection(db,"posts", id, "comments")
+
+    await addDoc(colRef, {
+      comment : commentToSend,
+      username:user.displayName,
+      useremail: user.email,
+      userimage:user.photoURL,
+    })
+
+    setLoading(false);
+    setComment("");
+  }
+
 
   return (
     <div className="border-t-[0.1px] pb-4">
@@ -32,12 +96,12 @@ function Post({
           className="h-11 w-11 rounded-full mr-4 object-contain"
         />
         <div>
-          <div className="flex items-center text-white">
+          <div className="flex items-center text-white text-[14px]">
             <h3 className="font-bold mr-1">{userName}</h3>
-            <span className="text-gray-400 hover:underline cursor-pointer text-sm mr-2">
+            <span className="text-gray-400 hover:underline cursor-pointer text-[12px] mr-2">
               {userEmail}
             </span>
-            <p className="text-sm text-gray-400">
+            <p className="text-[10px] text-gray-400">
               <Moment fromNow>{timestamp?.toDate()}</Moment>
             </p>
             <DotsHorizontalIcon className="flex-1 text-white h-6 -mr-[200px] cursor-pointer" />
@@ -55,13 +119,32 @@ function Post({
               !postImage && "w-[500px]"
             }`}
           >
-            <ChatIcon
-              className="h-6 hover:text-green-500 cursor-pointer text-gray-300"
-              onClick={() => setOpen(!open)}
-            />
-            <HeartIcon className="h-6 hover:text-pink-500 cursor-pointer text-gray-300" />
-            <ShareIcon className="h-6 hover:text-blue-500 cursor-pointer text-gray-300 " />
-            <UploadIcon className="h-6 hover:text-green-500 cursor-pointer text-gray-300 " />
+            <div className="flex items-center">
+              <ChatIcon
+                className="h-6 text-green-500 cursor-pointer"
+                onClick={() => setOpen(!open)}
+              />
+            </div>
+            <div className="flex items-center">
+              {hasLiked ? (
+                <>
+                  <HeartIconFilled
+                    className="h-6 text-pink-500 cursor-pointer mr-1"
+                    onClick={likePost}
+                  />
+                </>
+              ) : (
+                <>
+                  <HeartIcon
+                    className="h-6 text-pink-500 cursor-pointer mr-1"
+                    onClick={likePost}
+                  />
+                </>
+              )}
+              {likes.length >= 1 && <p className="text-pink-500 text-[12px]">{likes.length}</p>}
+            </div>
+            <ShareIcon className="h-6 text-blue-500 cursor-pointer  " />
+            <UploadIcon className="h-6 text-green-500 cursor-pointer  " />
           </div>
           {open && (
             <div className="mt-4">
