@@ -1,5 +1,5 @@
 /** @format */
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   SparklesIcon,
   GlobeIcon,
@@ -23,12 +23,10 @@ import {
   onSnapshot,
   updateDoc,
   doc,
+  query,
+  orderBy,
 } from "firebase/firestore";
-import {
-  getDownloadURL,
-  uploadString,
-  ref,
-} from "firebase/storage";
+import { getDownloadURL, uploadString, ref } from "firebase/storage";
 
 function Posts() {
   const [input, setInput] = useState("");
@@ -39,6 +37,19 @@ function Posts() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    const docRef = collection(db, "posts");
+    const Queried = query(docRef, orderBy("timestamp", "desc"));
+    onSnapshot(Queried, (snapshot) => {
+      setPosts(
+        snapshot.docs.map((doc) => ({
+          id: doc.id,
+          data: doc.data(),
+        }))
+      );
+    });
+  });
+
   // ? selecting a file for post
   const addImageToPost = (e) => {
     const reader = new FileReader();
@@ -47,7 +58,7 @@ function Posts() {
     }
     reader.onload = (readerEvent) => {
       setSelectedFile(readerEvent.target.result);
-    };                                                                                                                                                                                                                                                  
+    };
   };
   // ? adding emojis to input
   const addEmoji = (e) => {
@@ -187,9 +198,22 @@ function Posts() {
       </div>
       {/* end of all posts header */}
       <div>
-        <Post />
-        <Post />
-        <Post />
+        {posts.map(
+          ({
+            id,
+            data: { postText, userName, userEmail, image, userImg, timestamp },
+          }) => (
+            <Post
+              key={id}
+              postText={postText}
+              userEmail={userEmail}
+              userName={userName}
+              postImage={image}
+              userImg={userImg}
+              timestamp={timestamp}
+            />
+          )
+        )}
       </div>
     </div>
   );

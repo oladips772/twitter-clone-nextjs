@@ -9,8 +9,16 @@ import {
   EmojiHappyIcon,
 } from "@heroicons/react/outline";
 import { HeaertIcon as HeartIconFilled } from "@heroicons/react/solid";
+import Moment from "react-moment";
 
-function Post({}) {
+function Post({
+  postText,
+  userName,
+  userEmail,
+  userImg,
+  postImage,
+  timestamp,
+}) {
   const [open, setOpen] = useState(false);
   const [comment, setComment] = useState("");
   const [comments, setComments] = useState([]);
@@ -19,26 +27,34 @@ function Post({}) {
     <div className="border-t-[0.1px] pb-4">
       <div className="flex mx-2 mt-2">
         <img
-          src="https://media-exp1.licdn.com/dms/image/C4E03AQFOfPu93n6Kxw/profile-displayphoto-shrink_100_100/0/1632301101571?e=1648684800&v=beta&t=ixFggKFL60XV1npTtrk9PQnKH6ApktyZ-XF1n3mxF_4"
+          src={userImg}
           alt=""
-          className="h-12 w-12 rounded-full mr-4 object-contain"
+          className="h-11 w-11 rounded-full mr-4 object-contain"
         />
         <div>
           <div className="flex items-center text-white">
-            <h3 className="font-bold mr-1">oladipupo akorede</h3>
+            <h3 className="font-bold mr-1">{userName}</h3>
             <span className="text-gray-400 hover:underline cursor-pointer text-sm mr-2">
-              oladips200@gmail.com
+              {userEmail}
             </span>
-            <p className="text-sm text-gray-400">.1hr ago</p>
+            <p className="text-sm text-gray-400">
+              <Moment fromNow>{timestamp?.toDate()}</Moment>
+            </p>
             <DotsHorizontalIcon className="flex-1 text-white h-6 -mr-[200px] cursor-pointer" />
           </div>
-          <h4 className="text-white">nice build man</h4>
-          <img
-            src="https://firebasestorage.googleapis.com/v0/b/twitter-clone-nextjs-c850c.appspot.com/o/posts%2FTp0OPylv2FC1xJStmR62%2Fimage?alt=media&token=5fea40e2-9a38-4feb-8282-7dbf7c6d8284"
-            alt=""
-            className="max-h-[300px] rounded-xl mb-1 w-[500px] mt-2"
-          />
-          <div className="flex justify-between mt-3 ">
+          <h4 className="text-white">{postText}</h4>
+          {postImage && (
+            <img
+              src={postImage}
+              alt=""
+              className="max-h-[300px] rounded-xl mb-1 w-[550px] mt-2"
+            />
+          )}
+          <div
+            className={`flex justify-between mt-3 w-full ${
+              !postImage && "w-[500px]"
+            }`}
+          >
             <ChatIcon
               className="h-6 hover:text-green-500 cursor-pointer text-gray-300"
               onClick={() => setOpen(!open)}
