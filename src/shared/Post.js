@@ -18,6 +18,7 @@ import {
   deleteDoc,
   setDoc,
   doc,
+  addDoc,
 } from "firebase/firestore";
 
 function Post({
@@ -35,6 +36,7 @@ function Post({
   const [likes, setLikes] = useState([]);
   const [hasLiked, setHasLiked] = useState(false);
   const [user] = useAuthState(auth);
+  const [loading, setLoading] = useState(false);
 
   // likes useEffect function
   useEffect(() => {
@@ -48,6 +50,19 @@ function Post({
       );
     });
   }, [db, id]);
+
+  // fetching the comments
+  useEffect(() => {
+    const docRef = collection(db, "posts", id, "comments");
+    onSnapshot(docRef, (snapshot) => {
+      setComments(
+        snapshot.docs.map((doc) => ({
+          id: doc.id,
+          data: doc.data(),
+        }))
+      );
+    });
+  });
 
   useEffect(
     () =>
@@ -71,21 +86,20 @@ function Post({
   const sendComment = async () => {
     if (loading) return;
     setLoading(true);
-    setComment("")
+    setComment("");
     const commentToSend = comment;
-    const colRef = collection(db,"posts", id, "comments")
+    const colRef = collection(db, "posts", id, "comments");
 
     await addDoc(colRef, {
-      comment : commentToSend,
-      username:user.displayName,
+      comment: commentToSend,
+      username: user.displayName,
       useremail: user.email,
-      userimage:user.photoURL,
-    })
+      userimage: user.photoURL,
+    });
 
     setLoading(false);
     setComment("");
-  }
-
+  };
 
   return (
     <div className="border-t-[0.1px] pb-4">
@@ -121,9 +135,12 @@ function Post({
           >
             <div className="flex items-center">
               <ChatIcon
-                className="h-6 text-green-500 cursor-pointer"
+                className="h-6 text-green-500 cursor-pointer mr-1"
                 onClick={() => setOpen(!open)}
               />
+              {comments.length >= 1 && (
+                <p className="text-green-500 text-[12px]">{comments.length}</p>
+              )}
             </div>
             <div className="flex items-center">
               {hasLiked ? (
@@ -141,13 +158,33 @@ function Post({
                   />
                 </>
               )}
-              {likes.length >= 1 && <p className="text-pink-500 text-[12px]">{likes.length}</p>}
+              {likes.length >= 1 && (
+                <p className="text-pink-500 text-[12px]">{likes.length}</p>
+              )}
             </div>
             <ShareIcon className="h-6 text-blue-500 cursor-pointer  " />
             <UploadIcon className="h-6 text-green-500 cursor-pointer  " />
           </div>
           {open && (
-            <div className="mt-4">
+            <div className="mt-10">
+              {/* comments */}
+              <div className="mt-4 max-h-[90px] overflow-y-scroll mb-4">
+                {comments.map(
+                  ({ id, data: { comment, username, userimage } }) => (
+                    <div className="flex items-center my-3" ke={id}>
+                      <img
+                        src={userimage}
+                        alt=""
+                        className="h-7 w-7 rounded-full mr-2 object-contain"
+                      />
+                      <h5 className="text-sm font-bold text-white mr-1">
+                        {username} -{" "}
+                      </h5>
+                      <p className="text-sm text-white">{comment}</p>
+                    </div>
+                  )
+                )}
+              </div>
               <div className="flex items-center justify-between w-full">
                 <EmojiHappyIcon className="h-6  text-gray-50 mr-4" />
                 <input
@@ -156,20 +193,13 @@ function Post({
                   className="outline-none border-none flex-1 bg-black text-white"
                   onChange={(e) => setComment(e.target.value)}
                 />
-              </div>
-              {/* comments */}
-              <div className="mt-4 min-h-[60px] overflow-y-scroll">
-                <div className="flex items-center">
-                  <img
-                    src="https://media-exp1.licdn.com/dms/image/C4E03AQFOfPu93n6Kxw/profile-displayphoto-shrink_100_100/0/1632301101571?e=1648684800&v=beta&t=ixFggKFL60XV1npTtrk9PQnKH6ApktyZ-XF1n3mxF_4"
-                    alt=""
-                    className="h-7 w-7 rounded-full mr-2 object-contain"
-                  />
-                  <h5 className="text-sm font-bold text-white mr-1">
-                    oladipupo akorede -{" "}
-                  </h5>
-                  <p className="text-sm text-white">first comment guys</p>
-                </div>
+                <button
+                  className="text-blue-500"
+                  disabled={!comment.trim()}
+                  onClick={sendComment}
+                >
+                  Post
+                </button>
               </div>
             </div>
           )}
