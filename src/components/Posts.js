@@ -132,7 +132,7 @@ function Posts() {
                     onClick={() => setSelectedFile(null)}
                   />
                 )}
-                <Image
+                <img
                   src={selectedFile}
                   alt=""
                   className="max-h-[300px] rounded-2xl mb-1"
