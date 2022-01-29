@@ -1,7 +1,7 @@
 /** @format */
 export const data = [
   {
-    info: "Tecnology . Trending",
+    info: "Technology . Trending",
     title: "yahoo",
     tweet: "41.2k Tweets",
   },
