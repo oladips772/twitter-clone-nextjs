@@ -7,15 +7,23 @@ import {
   BookmarkIcon,
   ClipboardListIcon,
   UserIcon,
-    DotsCircleHorizontalIcon,
+  DotsCircleHorizontalIcon,
   DotsHorizontalIcon,
 } from "@heroicons/react/outline";
 import { HomeIcon } from "@heroicons/react/solid";
 import SidebarOption from "../shared/SidebarOption";
+import { auth } from "../firebase";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { signOut } from "firebase/auth";
 
 function Sidebar() {
+  const [user] = useAuthState(auth);
+  const SIGNOUT = async () => {
+    await signOut(auth).catch((err) => alert(err));
+  };
+
   return (
-    <div>
+    <div className="sm:mr-0">
       <img
         src="https://logos-world.net/wp-content/uploads/2020/04/Twitter-Logo.png"
         alt=""
@@ -38,17 +46,17 @@ function Sidebar() {
       <button className="text-white bg-[#00acee] mt-6 p-2 rounded-3xl w-[160px] cursor-pointer">
         Tweet
       </button>
-      <div className="mt-6 items-center flex">
+      <div className="mt-6 items-center flex cursor-pointer" onClick={SIGNOUT}>
         <img
           alt
-          src="https://media-exp1.licdn.com/dms/image/C4E03AQFOfPu93n6Kxw/profile-displayphoto-shrink_100_100/0/1632301101571?e=1648684800&v=beta&t=ixFggKFL60XV1npTtrk9PQnKH6ApktyZ-XF1n3mxF_4"
+          src={user.photoURL}
           className=" h-8 w-8 rounded-full object-contain mr-2"
         />
         <div>
-          <h4 className="text-white text-sm font-bold">Oladipupo akorede</h4>
-          <p className="text-gray-200 text-sm">oladips200@gmail.com</p>
+          <h4 className="text-white text-sm font-bold">{user.displayName}</h4>
+          <p className="text-gray-200 text-sm">{user.email}</p>
         </div>
-        <DotsHorizontalIcon className="text-[#2bc4ff] h-5 ml-4"/>
+        <DotsHorizontalIcon className="text-[#2bc4ff] h-5 ml-4" />
       </div>
     </div>
   );

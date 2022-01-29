@@ -101,12 +101,12 @@ function Posts() {
   return (
     <div className="pt-2">
       {/* posts header */}
-      <div className="flex justify-between items-center h-12 fixed top-0 w-[46%] bg-black z-50">
+      <div className="flex justify-between items-center h-12 fixed top-0 w-[46.72%] bg-black z-50">
         <h2 className="text-white text-lg font-bold ml-2">Home</h2>
-        <SparklesIcon className="h-6 text-[#2bc4ff] cursor-pointer" />
+        <SparklesIcon className="h-6 text-[#2bc4ff] cursor-pointer mr-2" />
       </div>
       {/* tweeting div */}
-      <div className="mt-12 mx-2 flex">
+      <div className={`mt-12 mx-2 flex ${loading && "opacity-60"}`}>
         <img
           alt
           src={user.photoURL}
@@ -116,6 +116,7 @@ function Posts() {
         <div className="flex-1">
           <div className="w-full">
             <textarea
+            disabled={loading}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Whats happening ?"
@@ -124,10 +125,12 @@ function Posts() {
             {/* selectdeFile div */}
             {selectedFile && (
               <div className="relative">
+                {!loading && (
                 <XIcon
                   className="h-6 text-white font-bold cursor-pointer absolute top-3 left-2 hover:bg-gray-600 rounded-full"
                   onClick={() => setSelectedFile(null)}
                 />
+                )}
                 <img
                   src={selectedFile}
                   alt=""
