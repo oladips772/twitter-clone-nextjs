@@ -15,6 +15,7 @@ import SidebarOption from "../shared/SidebarOption";
 import { auth } from "../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { signOut } from "firebase/auth";
+import Image from "next/image";
 
 function Sidebar() {
   const [user] = useAuthState(auth);
@@ -24,7 +25,7 @@ function Sidebar() {
 
   return (
     <div className="sm:mr-0">
-      <img
+      <Image
         src="https://logos-world.net/wp-content/uploads/2020/04/Twitter-Logo.png"
         alt=""
         className="h-6 cursor-pointer mb-6"
@@ -47,8 +48,8 @@ function Sidebar() {
         Tweet
       </button>
       <div className="mt-6 items-center flex cursor-pointer" onClick={SIGNOUT}>
-        <img
-          alt
+        <Image
+          alt=""
           src={user.photoURL}
           className=" h-8 w-8 rounded-full object-contain mr-2"
         />

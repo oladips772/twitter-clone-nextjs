@@ -27,6 +27,7 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { getDownloadURL, uploadString, ref } from "firebase/storage";
+import Image from "next/image";
 
 function Posts() {
   const [input, setInput] = useState("");
@@ -48,7 +49,7 @@ function Posts() {
         }))
       );
     });
-  },[]);
+  }, []);
 
   // ? selecting a file for post
   const addImageToPost = (e) => {
@@ -107,8 +108,8 @@ function Posts() {
       </div>
       {/* tweeting div */}
       <div className={`mt-12 mx-2 flex ${loading && "opacity-60"}`}>
-        <img
-          alt
+        <Image
+          alt=""
           src={user.photoURL}
           className=" h-12 w-12 rounded-full object-contain mr-2"
         />{" "}
@@ -116,7 +117,7 @@ function Posts() {
         <div className="flex-1">
           <div className="w-full">
             <textarea
-            disabled={loading}
+              disabled={loading}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Whats happening ?"
@@ -126,12 +127,12 @@ function Posts() {
             {selectedFile && (
               <div className="relative">
                 {!loading && (
-                <XIcon
-                  className="h-6 text-white font-bold cursor-pointer absolute top-3 left-2 hover:bg-gray-600 rounded-full"
-                  onClick={() => setSelectedFile(null)}
-                />
+                  <XIcon
+                    className="h-6 text-white font-bold cursor-pointer absolute top-3 left-2 hover:bg-gray-600 rounded-full"
+                    onClick={() => setSelectedFile(null)}
+                  />
                 )}
-                <img
+                <Image
                   src={selectedFile}
                   alt=""
                   className="max-h-[300px] rounded-2xl mb-1"

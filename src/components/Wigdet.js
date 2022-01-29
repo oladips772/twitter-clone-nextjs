@@ -23,7 +23,10 @@ function Wigdet() {
         </div>
         <div className="">
           {data.map((item, index) => (
-            <div className="my-4 cursor-pointer hover:bg-[#383e44f3]">
+            <div
+              className="my-4 cursor-pointer hover:bg-[#383e44f3]"
+              key={index}
+            >
               <div className="flex items-center justify-between mx-2">
                 <p className="text-sm text-gray-300">{item.info}</p>
                 <DotsHorizontalIcon className="w-6 h-6 text-gray-300" />
