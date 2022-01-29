@@ -108,7 +108,7 @@ function Posts() {
       </div>
       {/* tweeting div */}
       <div className={`mt-12 mx-2 flex ${loading && "opacity-60"}`}>
-        <Image
+        <img
           alt=""
           src={user.photoURL}
           className=" h-12 w-12 rounded-full object-contain mr-2"
